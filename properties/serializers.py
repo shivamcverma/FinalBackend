@@ -23,6 +23,7 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = '__all__'
+        read_only_fields = ['owner']
 
 
 class RoomSerializer(serializers.ModelSerializer):
@@ -32,7 +33,7 @@ class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = '__all__'
-
+        read_only_fields = ['owner']
     def validate(self, data):
 
         request = self.context['request']
