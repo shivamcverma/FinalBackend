@@ -33,12 +33,15 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
         user = self.request.user
 
-        # OWNER => only own properties
-        if user.is_authenticated and user.role == 'OWNER':
-            return Property.objects.filter(owner=user)
+        queryset = Property.objects.prefetch_related(
+            'images',
+            'rooms__images'
+        )
 
-        # STUDENT / PUBLIC => all properties
-        return Property.objects.all()
+        if user.is_authenticated and user.role == 'OWNER':
+            return queryset.filter(owner=user)
+
+        return queryset
 
     def perform_create(self, serializer):
 
@@ -88,16 +91,18 @@ class RoomViewSet(viewsets.ModelViewSet):
         if getattr(self, 'swagger_fake_view', False):
             return Room.objects.none()
 
+        queryset = Room.objects.prefetch_related(
+            'images'
+        )
+
         user = self.request.user
 
-        # OWNER => own rooms
         if user.is_authenticated and user.role == 'OWNER':
-            return Room.objects.filter(
+            return queryset.filter(
                 property__owner=user
             )
 
-        # STUDENT => all rooms
-        return Room.objects.all()
+        return queryset
 
     def perform_create(self, serializer):
 
