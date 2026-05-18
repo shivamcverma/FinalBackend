@@ -5,6 +5,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from .models import Property, Room
 from .serializers import PropertySerializer, RoomSerializer
 from .permissions import IsOwnerOrReadOnly
+from .models import PropertyImage, RoomImage
 
 class PropertyViewSet(viewsets.ModelViewSet):
     serializer_class = PropertySerializer
@@ -22,7 +23,16 @@ class PropertyViewSet(viewsets.ModelViewSet):
         return Property.objects.none()
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+
+        property_obj = serializer.save(owner=self.request.user)
+
+        images = self.request.FILES.getlist('uploaded_images')
+
+        for img in images:
+            PropertyImage.objects.create(
+                property=property_obj,
+                image=img
+            )
 
 class RoomViewSet(viewsets.ModelViewSet):
     serializer_class = RoomSerializer
@@ -37,3 +47,14 @@ class RoomViewSet(viewsets.ModelViewSet):
             return Room.objects.filter(property__owner=self.request.user)
 
         return Room.objects.none()
+    def perform_create(self, serializer):
+
+        room = serializer.save()
+
+        images = self.request.FILES.getlist('uploaded_images')
+
+        for img in images:
+            RoomImage.objects.create(
+                room=room,
+                image=img
+            )
