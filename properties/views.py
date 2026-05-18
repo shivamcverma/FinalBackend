@@ -12,7 +12,14 @@ class PropertyViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser]
 
     def get_queryset(self):
-        return Property.objects.filter(owner=self.request.user)
+
+        if getattr(self, 'swagger_fake_view', False):
+            return Property.objects.none()
+
+        if self.request.user.is_authenticated:
+            return Property.objects.filter(owner=self.request.user)
+
+        return Property.objects.none()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -23,4 +30,10 @@ class RoomViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser]
 
     def get_queryset(self):
-        return Room.objects.filter(property__owner=self.request.user)
+        if getattr(self, 'swagger_fake_view', False):
+            return Room.objects.none()
+
+        if self.request.user.is_authenticated:
+            return Room.objects.filter(property__owner=self.request.user)
+
+        return Room.objects.none()

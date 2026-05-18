@@ -20,7 +20,7 @@ class PropertySerializer(serializers.ModelSerializer):
     images = PropertyImageSerializer(many=True, read_only=True)
 
     uploaded_images = serializers.ListField(
-        child=serializers.ImageField(),
+        child=serializers.CharField(),
         write_only=True,
         required=False
     )
@@ -58,7 +58,7 @@ class RoomSerializer(serializers.ModelSerializer):
     images = RoomImageSerializer(many=True, read_only=True)
 
     uploaded_images = serializers.ListField(
-        child=serializers.ImageField(),
+        child=serializers.CharField(),
         write_only=True
     )
 
